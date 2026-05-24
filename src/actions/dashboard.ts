@@ -11,8 +11,8 @@ export async function getDashboardData(year: number) {
   if (!session) throw new Error('Unauthorized')
   const userId = session.user.id
 
-  const from = new Date(year, 0, 1)        // Jan 1, local midnight
-  const to = new Date(year, 11, 31, 23, 59, 59)  // Dec 31, 23:59:59, local
+  const from = new Date(Date.UTC(year, 0, 1))
+  const to = new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999))
 
   const [allTransactions, allTrips, [user]] = await Promise.all([
     db.select({ t: transactions, c: categories })
