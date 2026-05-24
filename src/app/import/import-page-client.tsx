@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { applyMappings, type ParsedCSV } from '@/lib/csv'
 import { importTransactions, importTrips, type ImportResult } from '@/actions/import'
-import { saveImportTemplate } from '@/actions/templates'
+import { saveImportTemplate, deleteImportTemplate, listImportTemplates } from '@/actions/templates'
 import type { InferSelectModel } from 'drizzle-orm'
 import type { csvImportTemplates } from '@/db/schema'
 
@@ -26,9 +26,19 @@ export function ImportPageClient({ initialTemplates }: { initialTemplates: Templ
   const [error, setError] = useState('')
 
   function applyTemplate(template: Template) {
-    const mappings = JSON.parse(template.columnMappings) as Record<string, string>
+    const parsedMappings = JSON.parse(template.columnMappings) as Record<string, string>
     setImportType(template.importType)
-    setMappings(mappings)
+    setMappings(parsedMappings)
+  }
+
+  async function handleDeleteTemplate(id: string) {
+    setError('')
+    try {
+      await deleteImportTemplate(id)
+      setTemplates(prev => prev.filter(t => t.id !== id))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete template')
+    }
   }
 
   async function handleImport() {
@@ -52,6 +62,8 @@ export function ImportPageClient({ initialTemplates }: { initialTemplates: Templ
     setError('')
     try {
       await saveImportTemplate(templateName, importType, mappings)
+      const updated = await listImportTemplates()
+      setTemplates(updated)
       setTemplateName('')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save template')
@@ -68,9 +80,10 @@ export function ImportPageClient({ initialTemplates }: { initialTemplates: Templ
               <p className="text-sm font-medium mb-2">Saved templates</p>
               <div className="flex flex-wrap gap-2">
                 {templates.map(t => (
-                  <Button key={t.id} variant="outline" size="sm" onClick={() => applyTemplate(t)}>
-                    {t.name}
-                  </Button>
+                  <div key={t.id} className="flex items-center gap-1">
+                    <Button variant="outline" size="sm" onClick={() => applyTemplate(t)}>{t.name}</Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleDeleteTemplate(t.id)}>×</Button>
+                  </div>
                 ))}
               </div>
             </div>

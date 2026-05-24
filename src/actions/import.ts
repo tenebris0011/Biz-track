@@ -19,6 +19,8 @@ export async function importTransactions(rows: MappedRow[], type: 'income' | 'ex
   if (!session) throw new Error('Unauthorized')
   const result: ImportResult = { imported: 0, skipped: 0, skippedRows: [] }
 
+  const validRows: typeof transactions.$inferInsert[] = []
+
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
     const dateStr = row.date?.trim()
@@ -31,13 +33,21 @@ export async function importTransactions(rows: MappedRow[], type: 'income' | 'ex
     if (isNaN(amount) || amount <= 0) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Invalid amount' }); continue }
     if (!description) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Missing description' }); continue }
 
-    await db.insert(transactions).values({
+    validRows.push({
       id: randomUUID(), userId: session.user.id, date, type,
       amount: Math.round(amount * 100) / 100,
       description,
       categoryId: null, notes: row.notes?.trim() || null, recurrenceId: null, createdAt: new Date(),
     })
     result.imported++
+  }
+
+  if (validRows.length > 0) {
+    db.transaction(tx => {
+      for (const row of validRows) {
+        tx.insert(transactions).values(row).run()
+      }
+    })
   }
 
   revalidatePath('/transactions')
@@ -49,6 +59,8 @@ export async function importTrips(rows: MappedRow[]): Promise<ImportResult> {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Unauthorized')
   const result: ImportResult = { imported: 0, skipped: 0, skippedRows: [] }
+
+  const validRows: typeof trips.$inferInsert[] = []
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
@@ -66,12 +78,20 @@ export async function importTrips(rows: MappedRow[]): Promise<ImportResult> {
     if (!purpose) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Missing purpose' }); continue }
     if (isNaN(oneWayMiles) || oneWayMiles <= 0) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Invalid miles' }); continue }
 
-    await db.insert(trips).values({
+    validRows.push({
       id: randomUUID(), userId: session.user.id, date, originAddress: origin,
       destinationAddress: destination, oneWayMiles: Math.round(oneWayMiles * 10) / 10,
       purpose, notes: row.notes?.trim() || null, createdAt: new Date(),
     })
     result.imported++
+  }
+
+  if (validRows.length > 0) {
+    db.transaction(tx => {
+      for (const row of validRows) {
+        tx.insert(trips).values(row).run()
+      }
+    })
   }
 
   revalidatePath('/trips')
