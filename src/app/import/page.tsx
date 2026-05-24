@@ -1,3 +1,7 @@
-export default function ImportPage() {
-  return <h1 className="text-2xl font-bold">Import</h1>
+import { listImportTemplates } from '@/actions/templates'
+import { ImportPageClient } from './import-page-client'
+
+export default async function ImportPage() {
+  const templates = await listImportTemplates()
+  return <ImportPageClient initialTemplates={templates} />
 }
