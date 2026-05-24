@@ -40,13 +40,17 @@ export async function listTransactions(filters?: {
 export async function createTransaction(data: TransactionInput) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Unauthorized')
+  const desc = data.description.trim()
+  if (!desc) throw new Error('Description is required')
+  const amount = Math.round(data.amount * 100) / 100
+  if (!isFinite(amount) || amount <= 0) throw new Error('Amount must be a positive number')
   await db.insert(transactions).values({
     id: randomUUID(),
     userId: session.user.id,
     date: data.date,
     type: data.type,
-    amount: data.amount,
-    description: data.description,
+    amount: amount,
+    description: desc,
     categoryId: data.categoryId ?? null,
     notes: data.notes ?? null,
     createdAt: new Date(),
@@ -58,13 +62,17 @@ export async function createTransaction(data: TransactionInput) {
 export async function updateTransaction(id: string, data: TransactionInput) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Unauthorized')
+  const desc = data.description.trim()
+  if (!desc) throw new Error('Description is required')
+  const amount = Math.round(data.amount * 100) / 100
+  if (!isFinite(amount) || amount <= 0) throw new Error('Amount must be a positive number')
   await db
     .update(transactions)
     .set({
       date: data.date,
       type: data.type,
-      amount: data.amount,
-      description: data.description,
+      amount: amount,
+      description: desc,
       categoryId: data.categoryId ?? null,
       notes: data.notes ?? null,
     })

@@ -34,8 +34,9 @@ export function TransactionForm({
     e.preventDefault()
     setError('')
     try {
+      const [y, m, d] = date.split('-').map(Number)
       const data = {
-        date: new Date(date),
+        date: new Date(y, m - 1, d),
         type,
         amount: parseFloat(amount),
         description,
