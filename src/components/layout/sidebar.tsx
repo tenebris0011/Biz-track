@@ -25,6 +25,7 @@ export function Sidebar() {
 
   async function handleSignOut() {
     await authClient.signOut()
+    router.refresh()
     router.push('/auth/signin')
   }
 
@@ -38,7 +39,7 @@ export function Sidebar() {
             href={href}
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors',
-              pathname === href
+              pathname === href || (href !== '/' && pathname.startsWith(href + '/'))
                 ? 'bg-primary text-primary-foreground'
                 : 'hover:bg-muted'
             )}
