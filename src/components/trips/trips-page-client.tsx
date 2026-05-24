@@ -2,10 +2,14 @@
 import { useState } from 'react'
 import { deleteTrip } from '@/actions/trips'
 import { Button } from '@/components/ui/button'
-import type { InferSelectModel } from 'drizzle-orm'
-import type { trips } from '@/db/schema'
 
-type Trip = InferSelectModel<typeof trips>
+type Trip = {
+  id: string
+  date: Date | string   // string after RSC serialization
+  destinationAddress: string
+  purpose: string
+  oneWayMiles: number
+}
 
 export function TripsPageClient({ trips: initialTrips }: { trips: Trip[] }) {
   const [trips, setTrips] = useState(initialTrips)
@@ -32,7 +36,7 @@ export function TripsPageClient({ trips: initialTrips }: { trips: Trip[] }) {
           <div key={t.id} className="p-3 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{t.purpose}</p>
-              <p className="text-xs text-muted-foreground">{t.date.toLocaleDateString()} · {t.destinationAddress}</p>
+              <p className="text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString()} · {t.destinationAddress}</p>
             </div>
             <div className="flex items-center gap-3">
               <p className="text-sm font-semibold">{(t.oneWayMiles * 2).toFixed(1)} mi RT</p>

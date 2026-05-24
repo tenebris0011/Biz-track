@@ -1,5 +1,5 @@
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org'
-const OSRM_BASE = 'http://router.project-osrm.org'
+const OSRM_BASE = 'https://router.project-osrm.org'
 
 export interface AddressSuggestion {
   displayName: string
