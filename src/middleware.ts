@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  if (pathname.startsWith('/auth') || pathname.startsWith('/api/auth')) {
+  if (pathname.startsWith('/auth/') || pathname === '/auth' || pathname.startsWith('/api/auth/') || pathname === '/api/auth') {
     return NextResponse.next()
   }
   const session = await auth.api.getSession({ headers: request.headers })
