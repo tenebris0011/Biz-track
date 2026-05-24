@@ -18,12 +18,15 @@ export default function SignInPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await authClient.signIn.email({ email, password })
-    if (error) {
-      setError(error.message ?? 'Sign in failed')
+    try {
+      const { error: signInError } = await authClient.signIn.email({ email, password })
+      if (signInError) {
+        setError(signInError.message ?? 'Sign in failed')
+      } else {
+        router.push('/')
+      }
+    } finally {
       setLoading(false)
-    } else {
-      router.push('/')
     }
   }
 
