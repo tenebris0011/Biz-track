@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, real, check } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
@@ -56,7 +56,9 @@ export const categories = sqliteTable('categories', {
   type: text('type', { enum: ['income', 'expense'] }).notNull(),
   irsLine: text('irs_line'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
+}, () => ({
+  typeCheck: check('categories_type_check', sql`type IN ('income', 'expense')`),
+}))
 
 export const recurrenceRules = sqliteTable('recurrence_rules', {
   id: text('id').primaryKey(),
@@ -72,7 +74,10 @@ export const recurrenceRules = sqliteTable('recurrence_rules', {
   endDate: integer('end_date', { mode: 'timestamp' }),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
+}, () => ({
+  typeCheck: check('recurrence_rules_type_check', sql`type IN ('income', 'expense')`),
+  frequencyCheck: check('recurrence_rules_frequency_check', sql`frequency IN ('daily', 'weekly', 'monthly', 'yearly')`),
+}))
 
 export const transactions = sqliteTable('transactions', {
   id: text('id').primaryKey(),
@@ -85,7 +90,9 @@ export const transactions = sqliteTable('transactions', {
   notes: text('notes'),
   recurrenceId: text('recurrence_id').references(() => recurrenceRules.id, { onDelete: 'set null' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
+}, () => ({
+  typeCheck: check('transactions_type_check', sql`type IN ('income', 'expense')`),
+}))
 
 export const trips = sqliteTable('trips', {
   id: text('id').primaryKey(),
@@ -106,4 +113,6 @@ export const csvImportTemplates = sqliteTable('csv_import_templates', {
   importType: text('import_type', { enum: ['income', 'expense', 'trip'] }).notNull(),
   columnMappings: text('column_mappings').notNull(), // JSON string
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
+}, () => ({
+  importTypeCheck: check('csv_import_templates_import_type_check', sql`import_type IN ('income', 'expense', 'trip')`),
+}))
