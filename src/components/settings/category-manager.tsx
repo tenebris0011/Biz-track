@@ -14,17 +14,30 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
   const [cats, setCats] = useState(initialCategories)
   const [name, setName] = useState('')
   const [type, setType] = useState<'income' | 'expense'>('expense')
+  const [error, setError] = useState('')
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
-    const newCat = await createCategory({ name, type })
-    setCats(prev => [...prev, newCat])
-    setName('')
+    setError('')
+    try {
+      const newCat = await createCategory({ name, type })
+      setCats(prev => [...prev, newCat])
+      setName('')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add category')
+    }
   }
 
   async function handleDelete(id: string) {
-    await deleteCategory(id)
-    setCats(prev => prev.filter(c => c.id !== id))
+    setError('')
+    const prev = cats
+    setCats(cats.filter(c => c.id !== id))
+    try {
+      await deleteCategory(id)
+    } catch (err) {
+      setCats(prev)
+      setError(err instanceof Error ? err.message : 'Failed to remove category')
+    }
   }
 
   return (
@@ -40,6 +53,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
         </Select>
         <Button type="submit">Add</Button>
       </form>
+      {error && <p className="text-sm text-destructive">{error}</p>}
       <ul className="space-y-1">
         {cats.map(cat => (
           <li key={cat.id} className="flex items-center justify-between py-1">

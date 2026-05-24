@@ -21,10 +21,13 @@ export async function listCategories(type?: 'income' | 'expense') {
 export async function createCategory(data: { name: string; type: 'income' | 'expense' }) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error('Unauthorized')
+  const name = data.name.trim()
+  if (!name) throw new Error('Category name is required')
+  if (name.length > 100) throw new Error('Category name must be 100 characters or fewer')
   const [row] = await db.insert(categories).values({
     id: randomUUID(),
     userId: session.user.id,
-    name: data.name,
+    name,
     type: data.type,
     irsLine: null,
     createdAt: new Date(),
