@@ -99,7 +99,8 @@ export async function logManualOccurrence(ruleId: string) {
       createdAt: now,
     }).run()
     const nextRunAt = advanceDate(rule.nextRunAt, rule.frequency)
-    tx.update(recurrenceRules).set({ nextRunAt }).where(eq(recurrenceRules.id, ruleId)).run()
+    const isActive = !rule.endDate || nextRunAt <= rule.endDate
+    tx.update(recurrenceRules).set({ nextRunAt, isActive }).where(eq(recurrenceRules.id, ruleId)).run()
   })
   revalidatePath('/recurring')
   revalidatePath('/transactions')
