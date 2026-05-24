@@ -1,13 +1,24 @@
 services:
   app:
     build: .
-    ports:
-      - '3000:3000'
     volumes:
       - biz-track-data:/app/data
     env_file:
       - .env
     restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.biz-track.rule=Host(`biztrack.home.wilsoncode.space`)"
+      - "traefik.http.routers.biz-track.entrypoints=websecure"
+      - "traefik.http.routers.biz-track.tls.certresolver=cloudflare"
+      - "traefik.http.routers.biz-track.middlewares=secure-headers@file"
+      - "traefik.http.services.biz-track.loadbalancer.server.port=3000"
 
 volumes:
   biz-track-data:
+
+networks:
+  proxy:
+    external: true

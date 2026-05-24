@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 type Trip = {
   id: string
-  date: Date | string   // string after RSC serialization
+  date: Date | string
   destinationAddress: string
   purpose: string
   oneWayMiles: number
@@ -33,14 +33,18 @@ export function TripsPageClient({ trips: initialTrips }: { trips: Trip[] }) {
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="border rounded-md divide-y">
         {trips.map(t => (
-          <div key={t.id} className="p-3 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t.purpose}</p>
-              <p className="text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString()} · {t.destinationAddress}</p>
+          <div key={t.id} className="p-3 space-y-1">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm font-medium leading-snug">{t.purpose}</p>
+              <p className="text-sm font-semibold shrink-0">{(t.oneWayMiles * 2).toFixed(1)} mi RT</p>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-sm font-semibold">{(t.oneWayMiles * 2).toFixed(1)} mi RT</p>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}>Delete</Button>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground line-clamp-1">
+                {new Date(t.date).toLocaleDateString()} · {t.destinationAddress}
+              </p>
+              <Button variant="ghost" size="sm" className="shrink-0" onClick={() => handleDelete(t.id)}>
+                Delete
+              </Button>
             </div>
           </div>
         ))}

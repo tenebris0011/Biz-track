@@ -32,7 +32,7 @@ export function TransactionList({ rows: initialRows }: { rows: Row[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <Select value={filter} onValueChange={v => setFilter(v as typeof filter)}>
           <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -41,22 +41,28 @@ export function TransactionList({ rows: initialRows }: { rows: Row[] }) {
             <SelectItem value="expense">Expense</SelectItem>
           </SelectContent>
         </Select>
-        <Link href="/transactions/new"><Button>Add Transaction</Button></Link>
+        <Link href="/transactions/new"><Button>Add</Button></Link>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="border rounded-md divide-y">
         {filtered.map(({ transaction: t, category }) => (
-          <div key={t.id} className="flex items-center justify-between p-3">
-            <div>
-              <p className="text-sm font-medium">{t.description}</p>
-              <p className="text-xs text-muted-foreground">{t.date.toLocaleDateString()} · {category?.name ?? '—'}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge variant={t.type === 'income' ? 'default' : 'secondary'}>
+          <div key={t.id} className="p-3 space-y-1">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm font-medium leading-snug">{t.description}</p>
+              <Badge variant={t.type === 'income' ? 'default' : 'secondary'} className="shrink-0">
                 {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
               </Badge>
-              <Link href={`/transactions/${t.id}/edit`}><Button variant="ghost" size="sm">Edit</Button></Link>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}>Delete</Button>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                {new Date(t.date).toLocaleDateString()} · {category?.name ?? '—'}
+              </p>
+              <div className="flex items-center gap-1 shrink-0">
+                <Link href={`/transactions/${t.id}/edit`}>
+                  <Button variant="ghost" size="sm">Edit</Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}>Delete</Button>
+              </div>
             </div>
           </div>
         ))}

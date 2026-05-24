@@ -12,7 +12,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const data = await getDashboardData(isNaN(year) ? new Date().getFullYear() : year)
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Dashboard — {year}</h1>
         <YearSelector currentYear={year} />
       </div>

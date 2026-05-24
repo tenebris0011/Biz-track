@@ -3,7 +3,7 @@ import { testDb } from '../setup'
 import { recurrenceRules, transactions } from '../../src/db/schema'
 import { eq, and, lte } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
-import { advanceDate } from '../../src/actions/recurring'
+import { advanceDate } from '../../src/lib/date-utils'
 
 async function runCron(db: typeof testDb) {
   const now = new Date()

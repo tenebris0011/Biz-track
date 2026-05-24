@@ -28,15 +28,21 @@ export function ColumnMapper({
 }) {
   const fields = importType === 'trip' ? TRIP_FIELDS : TRANSACTION_FIELDS
 
+  const validHeaders = csvHeaders.filter(h => h.trim() !== '')
+
   return (
     <div className="space-y-3">
       {fields.map(field => (
         <div key={field.key} className="flex items-center gap-4">
           <Label className="w-40 shrink-0">{field.label}{field.required ? ' *' : ''}</Label>
-          <Select value={mappings[field.key] ?? ''} onValueChange={v => onChange({ ...mappings, [field.key]: v })}>
+          <Select
+            value={mappings[field.key] ?? ''}
+            onValueChange={v => onChange({ ...mappings, [field.key]: v === '__skip' ? '' : v })}
+          >
             <SelectTrigger className="flex-1"><SelectValue placeholder="Select CSV column" /></SelectTrigger>
             <SelectContent>
-              {csvHeaders.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+              {!field.required && <SelectItem value="__skip">— skip —</SelectItem>}
+              {validHeaders.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>

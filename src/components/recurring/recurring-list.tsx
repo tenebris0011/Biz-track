@@ -63,29 +63,29 @@ export function RecurringList({ rules: initialRules }: { rules: Rule[] }) {
         {rules.map(rule => {
           const isDue = !rule.isSubscription && rule.isActive && rule.nextRunAt <= now
           return (
-            <div key={rule.id} className="p-3 space-y-1">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">{rule.description}</p>
+            <div key={rule.id} className="p-3 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{rule.description}</p>
                   <p className="text-xs text-muted-foreground">
                     ${rule.amount.toFixed(2)} · {rule.frequency} · next: {rule.nextRunAt.toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={rule.isSubscription ? 'default' : 'secondary'}>
-                    {rule.isSubscription ? 'Auto' : 'Manual'}
-                  </Badge>
-                  <Button variant="ghost" size="sm" onClick={() => handleToggle(rule.id, rule.isActive)}>
-                    {rule.isActive ? 'Pause' : 'Resume'}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(rule.id)}>Delete</Button>
-                </div>
+                <Badge variant={rule.isSubscription ? 'default' : 'secondary'} className="shrink-0">
+                  {rule.isSubscription ? 'Auto' : 'Manual'}
+                </Badge>
               </div>
-              {isDue && (
-                <Button size="sm" onClick={() => handleLog(rule.id)}>
-                  Log now ({rule.nextRunAt.toLocaleDateString()})
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => handleToggle(rule.id, rule.isActive)}>
+                  {rule.isActive ? 'Pause' : 'Resume'}
                 </Button>
-              )}
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(rule.id)}>Delete</Button>
+                {isDue && (
+                  <Button size="sm" onClick={() => handleLog(rule.id)}>
+                    Log now ({rule.nextRunAt.toLocaleDateString()})
+                  </Button>
+                )}
+              </div>
             </div>
           )
         })}

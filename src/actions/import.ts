@@ -30,12 +30,15 @@ export async function importTransactions(rows: MappedRow[], type: 'income' | 'ex
     if (!dateStr) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Missing date' }); continue }
     const date = new Date(dateStr)
     if (isNaN(date.getTime())) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Invalid date' }); continue }
-    if (isNaN(amount) || amount <= 0) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Invalid amount' }); continue }
+    if (isNaN(amount) || amount === 0) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Invalid amount' }); continue }
     if (!description) { result.skipped++; result.skippedRows.push({ row: i + 1, reason: 'Missing description' }); continue }
 
+    // derive type from sign when present (e.g. MyCheckbook: negative=expense, positive=income)
+    const derivedType = amount < 0 ? 'expense' : amount > 0 ? 'income' : type
+
     validRows.push({
-      id: randomUUID(), userId: session.user.id, date, type,
-      amount: Math.round(amount * 100) / 100,
+      id: randomUUID(), userId: session.user.id, date, type: derivedType,
+      amount: Math.round(Math.abs(amount) * 100) / 100,
       description,
       categoryId: null, notes: row.notes?.trim() || null, recurrenceId: null, createdAt: new Date(),
     })

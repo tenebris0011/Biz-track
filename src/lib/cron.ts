@@ -3,7 +3,7 @@ import { db } from '@/db'
 import { recurrenceRules, transactions } from '@/db/schema'
 import { and, eq, lte } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
-import { advanceDate } from '@/actions/recurring'
+import { advanceDate } from '@/lib/date-utils'
 
 export function startCronJobs() {
   cron.schedule('0 0 * * *', processDueSubscriptions)

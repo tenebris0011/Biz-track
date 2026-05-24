@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createTrip } from '@/actions/trips'
 import { AddressAutocomplete } from './address-autocomplete'
@@ -20,6 +20,16 @@ export function TripForm({ defaultOrigin }: { defaultOrigin: string }) {
   const [manualMiles, setManualMiles] = useState('')
   const [calculating, setCalculating] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!defaultOrigin) return
+    fetch(`/api/geocode?q=${encodeURIComponent(defaultOrigin)}`)
+      .then(r => r.ok ? r.json() : [])
+      .then((results: AddressSuggestion[]) => {
+        if (results[0]) setOriginCoords({ lat: results[0].lat, lon: results[0].lon })
+      })
+      .catch(() => {})
+  }, [defaultOrigin])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -62,7 +72,7 @@ export function TripForm({ defaultOrigin }: { defaultOrigin: string }) {
       })
       router.push('/trips')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save trip')
+      setError((err instanceof Error && err.message) ? err.message : 'Failed to save trip')
     }
   }
 
@@ -74,7 +84,7 @@ export function TripForm({ defaultOrigin }: { defaultOrigin: string }) {
         <AddressAutocomplete
           value={origin}
           onChange={v => { setOrigin(v); setOriginCoords(null) }}
-          onSelect={(s: AddressSuggestion) => setOriginCoords({ lat: s.lat, lon: s.lon })}
+          onSelect={(s: AddressSuggestion) => { setOrigin(s.displayName); setOriginCoords({ lat: s.lat, lon: s.lon }) }}
           placeholder="Start address"
         />
       </div>
@@ -83,7 +93,7 @@ export function TripForm({ defaultOrigin }: { defaultOrigin: string }) {
         <AddressAutocomplete
           value={destination}
           onChange={v => { setDestination(v); setDestCoords(null) }}
-          onSelect={(s: AddressSuggestion) => setDestCoords({ lat: s.lat, lon: s.lon })}
+          onSelect={(s: AddressSuggestion) => { setDestination(s.displayName); setDestCoords({ lat: s.lat, lon: s.lon }) }}
           placeholder="End address"
         />
       </div>

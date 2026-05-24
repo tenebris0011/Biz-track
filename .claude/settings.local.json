@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git commit *)",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('next:', p['dependencies'].get\\('next','missing'\\)\\); print\\('react:', p['dependencies'].get\\('react','missing'\\)\\)\")",
+      "Bash(git -C /zpool/nathan/Projects/biz-track log --oneline -3)",
+      "Bash(node -e ' *)",
+      "Bash(make deploy *)"
+    ]
+  }
+}

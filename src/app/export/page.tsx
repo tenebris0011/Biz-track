@@ -22,7 +22,7 @@ export default function ExportPage() {
     const params = new URLSearchParams({ type })
     if (from) params.set('from', from)
     if (to) params.set('to', to)
-    return `/export?${params.toString()}`
+    return `/api/export?${params.toString()}`
   }
 
   return (

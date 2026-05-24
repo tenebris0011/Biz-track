@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 import { revalidatePath } from 'next/cache'
+import { advanceDate } from '@/lib/date-utils'
 
 export type RecurrenceInput = {
   type: 'income' | 'expense'
@@ -17,17 +18,6 @@ export type RecurrenceInput = {
   isSubscription: boolean
   startDate: Date
   endDate?: Date
-}
-
-export function advanceDate(date: Date, frequency: string): Date {
-  const next = new Date(date)
-  switch (frequency) {
-    case 'daily': next.setUTCDate(next.getUTCDate() + 1); break
-    case 'weekly': next.setUTCDate(next.getUTCDate() + 7); break
-    case 'monthly': next.setUTCMonth(next.getUTCMonth() + 1); break
-    case 'yearly': next.setUTCFullYear(next.getUTCFullYear() + 1); break
-  }
-  return next
 }
 
 export async function listRecurrenceRules() {

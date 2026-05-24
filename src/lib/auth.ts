@@ -8,7 +8,7 @@ export const auth = betterAuth({
     provider: 'sqlite',
     schema: { user: users, session: sessions, account: accounts, verification: verifications },
   }),
-  emailAndPassword: { enabled: true, disableSignUp: true },
+  emailAndPassword: { enabled: true, disableSignUp: false },
   session: { expiresIn: 60 * 60 * 24 * 30 }, // 30 days
 })
 
