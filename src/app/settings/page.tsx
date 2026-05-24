@@ -1,6 +1,5 @@
 import { getProfile } from '@/actions/profile'
 import { ProfileForm } from './profile-form'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function SettingsPage() {
   const profile = await getProfile()
