@@ -28,3 +28,30 @@ export function applyMappings(rows: Record<string, string>[], mappings: ColumnMa
     return mapped
   })
 }
+
+export function exportTransactionsCSV(
+  rows: Array<{ date: Date; type: string; amount: number; description: string; categoryName: string | null; notes: string | null }>
+): string {
+  return Papa.unparse(rows.map(r => ({
+    date: r.date.toISOString().slice(0, 10),
+    type: r.type,
+    amount: r.amount.toFixed(2),
+    category: r.categoryName ?? '',
+    description: r.description,
+    notes: r.notes ?? '',
+  })))
+}
+
+export function exportTripsCSV(
+  rows: Array<{ date: Date; originAddress: string; destinationAddress: string; oneWayMiles: number; purpose: string; notes: string | null }>
+): string {
+  return Papa.unparse(rows.map(r => ({
+    date: r.date.toISOString().slice(0, 10),
+    origin: r.originAddress,
+    destination: r.destinationAddress,
+    one_way_miles: r.oneWayMiles.toFixed(2),
+    round_trip_miles: (r.oneWayMiles * 2).toFixed(2),
+    purpose: r.purpose,
+    notes: r.notes ?? '',
+  })))
+}
