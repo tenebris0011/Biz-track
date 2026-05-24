@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   const userId = session.user.id
   const from = fromStr ? new Date(fromStr) : undefined
-  const to = toStr ? new Date(toStr + 'T23:59:59Z') : undefined
+  const to = toStr ? new Date(toStr + 'T23:59:59.999Z') : undefined
 
   if (dataType === 'transactions') {
     const conditions = [eq(transactions.userId, userId)]

@@ -8,7 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 function triggerDownload(url: string) {
   const a = document.createElement('a')
   a.href = url
+  a.download = ''
+  document.body.appendChild(a)
   a.click()
+  document.body.removeChild(a)
 }
 
 export default function ExportPage() {
@@ -37,7 +40,7 @@ export default function ExportPage() {
         <Button variant="outline" onClick={() => triggerDownload(buildUrl('trips'))}>Download Trips CSV</Button>
         <Button variant="secondary" onClick={() => {
           triggerDownload(buildUrl('transactions'))
-          setTimeout(() => triggerDownload(buildUrl('trips')), 300)
+          triggerDownload(buildUrl('trips'))
         }}>Download Both</Button>
       </div>
     </div>
